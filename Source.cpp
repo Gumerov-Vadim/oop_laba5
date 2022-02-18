@@ -104,31 +104,32 @@ namespace check_classes {
 			name = "first";
 		}
 		virtual ~first_c(){}
-		bool isA(std::string name) { bool who; name == "first" ? who = true : who = false; return who; }
+		bool isA(std::string name) { return (name == this->classname()); }
 	};
 	class second_c :public first_c {
 	public:
 		std::string classname() {
 			return "second";
 		}
-		bool isA(std::string name) { bool who; name == "second" ? who = true : who = first_c::isA(name); return who; }
+		bool isA(std::string name) { return (name == this->classname() || this->first_c::isA(name)); }
 		second_c() {
 			name = "second";
 		}
 		~second_c() {}
 	};
-	class third_c :public first_c {
+	class third_c :public second_c {
 	public:
 		std::string classname() {
 			return "third";
 		}
-		bool isA(std::string name) { bool who; name == "third" ? who = true : who = second_c::isA(name); return who; } 
+		bool isA(std::string name) { return (name == this->classname() || this->second_c::isA(name)); }
 		third_c() {
 			name = "third";
 		}
 		~third_c() {}
 	};
 }
+
 int main() {
 	setlocale(LC_ALL, "Russian"); 
 	
