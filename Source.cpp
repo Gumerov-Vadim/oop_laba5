@@ -232,9 +232,40 @@ int main() {
 		next();
 		printf("Пример опасного приведения типов:\n");
 
+		first_c* fc = new first_c();
 		first_c* sc = new second_c();
-		second_c* scptr = (second_c*)sc;
+		first_c* tc = new third_c();
+		fcm[0] = fc;
+		fcm[1] = sc;
+		fcm[2] = tc;
+
+		for (int i = 0; i < 3; i++) {
+			scm[i] = NULL;
+		}
+		printf("создадим два массива с указателями класса first fcm[3] и класса second scm[3].\nЗаполним первый массив указателями на объекты классов first,second,third\nи с помощью опасного приведения типов запишем указатели из первого массива во второй.\n");
+		for (int i = 0; i < 3; i++) {
+			if (fcm[i]->isA("second")) {
+				printf("проверка isA(\"second\") == true\nscm[%d]=fcm[%d] (fcm[%d]-> ",i,i,i); std::cout << fcm[i]->classname()<<")\n";
+				scm[i] = (second_c*)fcm[i];
+			}
+			else {
+				printf("проверка isA(\"second\")== false\n");
+				printf("fcm[% d] -> ", i);
+				std::cout<<fcm[i]->classname()<<"\n";
+			}
+		}
+		printf("\nТеперь массив scm выглядит так:\n");
+		for (int i = 0; i < 3; i++) {
+			if (scm[i] != NULL) {
+				std::cout <<i<<"-й" << " объект: " << scm[i]->classname() << "\n";
+			}
+			else {
+				printf("%d-й объект: NULL\n", i);
+			}
+		}
+		delete fc;
 		delete sc;
+		delete tc;
 	}
 	return 0;
 }
