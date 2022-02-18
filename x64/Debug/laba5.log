@@ -1,7 +1,3 @@
 ﻿  Source.cpp
-C:\Users\suisideboy\source\repos\laba5\Source.cpp(113,2): warning C4624: "check_classes::second_c": деструктор неявно определен как удаленный
-C:\Users\suisideboy\source\repos\laba5\Source.cpp(113,2): error C2282: "check_classes::second_c::~second_c" не удается переопределить "check_classes::first_c::~first_c"
-C:\Users\suisideboy\source\repos\laba5\Source.cpp(104,12): message : "check_classes::first_c::~first_c" не удален
-C:\Users\suisideboy\source\repos\laba5\Source.cpp(110,11): error C2248: check_classes::first_c::first_c: невозможно обратиться к private член, объявленному в классе "check_classes::first_c"
-C:\Users\suisideboy\source\repos\laba5\Source.cpp(101): message : см. объявление "check_classes::first_c::first_c"
-C:\Users\suisideboy\source\repos\laba5\Source.cpp(97): message : см. объявление "check_classes::first_c"
+C:\Users\suisideboy\source\repos\laba5\Source.cpp(139,2): warning C4065: оператор switch содержит метку "default", но не содержит ни одной метки "case"
+  laba5.vcxproj -> C:\Users\suisideboy\source\repos\laba5\x64\Debug\laba5.exe

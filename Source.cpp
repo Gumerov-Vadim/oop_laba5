@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <conio.h>
 namespace virtual_destructor {
 	class IBase {
 	protected:
@@ -94,42 +95,49 @@ namespace check_classes {
 	public:
 		virtual std::string classname() = NULL;
 		virtual bool isA(std::string name) = NULL;
+		virtual void what_was_created() = NULL;
+		virtual void was_deleted() = NULL;
 	};
 	class first_c :public Ic {
+	protected:
+		void was_deleted(){ std::cout << "объект класса " << name << " удален\n"; }
+		void what_was_created() { printf("Был создан объект класса "); std::cout << name<<"\n"; }
 	public:
 		std::string classname() {
 			return "first";
 		}
-		first_c() {
-			name = "first";
-		}
-		virtual ~first_c(){}
-		bool isA(std::string name) { return (name == this->classname()); }
+		first_c() { name = "first"; what_was_created(); }
+		virtual ~first_c() { was_deleted(); }
+		bool isA(std::string name) { return (name == "first"); }
 	};
 	class second_c :public first_c {
 	public:
 		std::string classname() {
 			return "second";
 		}
-		bool isA(std::string name) { return (name == this->classname() || this->first_c::isA(name)); }
-		second_c() {
-			name = "second";
-		}
-		~second_c() {}
+		bool isA(std::string name) { return (name == "second" || this->first_c::isA(name)); }
+		second_c() {name = "second"; what_was_created();}
+		~second_c() { was_deleted(); }
 	};
 	class third_c :public second_c {
 	public:
 		std::string classname() {
 			return "third";
 		}
-		bool isA(std::string name) { return (name == this->classname() || this->second_c::isA(name)); }
-		third_c() {
-			name = "third";
-		}
-		~third_c() {}
+		bool isA(std::string name) { return (name == "third" || this->second_c::isA(name)); }
+		third_c() {	name = "third"; what_was_created();	}
+		~third_c() { was_deleted(); }
 	};
 }
-
+void next() {
+	switch (_getch())
+	{
+	default:
+		system("cls");
+		printf("\n");
+		break;
+	}
+}
 int main() {
 	setlocale(LC_ALL, "Russian"); 
 	
@@ -142,7 +150,7 @@ int main() {
 		printf("Виртуальный деструктор нужен, чтобы при удалении объекта класса наследника из переменной базового класса вызывался правильный деструктор\n");
 
 	}
-	printf("\n\n");
+	next();
 	{
 		//•	в методе1 базового класса вызывается метод2, который определен в этом же классе как невиртуальный, у класса - потомка метод2 переопределен
 		//что происходит при вызове метода1 у класса - потомка ?
@@ -153,13 +161,80 @@ int main() {
 		desc.nv_first_meth();//этот метод не виртуальный
 		printf("В этом случае вызывается функция second_meth базового класса Base\n");
 	}
-	printf("\n\n");
+	next();
 	{
 		using namespace virtual_methods;
 		Base* desc = new Desc();
 		desc->nv_meth();
 		desc->v_meth();
 		delete desc;
+	}
+	next(); 
+	{
+		using namespace check_classes;
+		first_c* fc1 = new first_c();
+		first_c* fc2 = new second_c();
+		first_c* fc3 = new third_c();
+		second_c* sc2 = new second_c();
+		second_c* sc3 = new third_c();
+		third_c* tc3 = new third_c();
+
+		first_c* fcm[3] = { fc1,fc2,fc3 };
+		second_c* scm[3] = { sc2,sc3,tc3 };
+		printf("\nСозданы два массива указателей fcm[3] = { fc1,fc2,fc3 }\n(Массив указателей на объекты класса first_c или его потомков)\n и scm[3] = { sc2,sc3,tc3 }\n(Массив указателей на объекты класса second_c или его потомков)\n");
+		printf("\n проверим с помощью методов classname(\"name\") и isA(\"name\") к какому классу относятся объекты внутри массива:\n");
+		printf("массив fcm, метод classname()\n");
+		for (int i = 0; i < 3; i++) {
+			printf("элемент №%d :\n", i);
+			std::cout << fcm[i]->classname() << "\n";
+		}
+		printf("\nмассив fcm, метод isA\n");
+		for (int i = 0; i < 3; i++) {
+			printf("элемент №%d: \n", i);
+			if (fcm[i]->isA("first")) {
+				printf("first\n");
+			}
+			if (fcm[i]->isA("second")) {
+				printf("second\n");
+			}
+			if (fcm[i]->isA("third")) {
+				printf("third\n");
+			}
+		}
+
+		printf("\nмассив scm, метод classname()\n");
+		for (int i = 0; i < 3; i++) {
+			printf("элемент №%d :\n", i);
+			std::cout << fcm[i]->classname() << "\n";
+		}
+		printf("\nмассив scm, метод isA\n");
+		for (int i = 0; i < 3; i++) {
+			printf("элемент №%d: \n", i);
+			if (scm[i]->isA("first")) {
+				printf("first\n");
+			}
+			if (scm[i]->isA("second")) {
+				printf("second\n");
+			}
+			if (scm[i]->isA("third")) {
+				printf("third\n");
+			}
+		}
+		printf("\nОтличие между методами classname() и isA() в том, что classname возвращает название созданного объекта,\n а метод isA() возвращает true, если объект принадлежит данному классу или является его наследником\n");
+		delete fc1;
+		delete fc2;
+		delete fc3;
+		delete sc2;
+		delete sc3;
+		delete tc3;
+
+		//Приведение типов
+		next();
+		printf("Пример опасного приведения типов:\n");
+
+		first_c* sc = new second_c();
+		second_c* scptr = (second_c*)sc;
+		delete sc;
 	}
 	return 0;
 }
