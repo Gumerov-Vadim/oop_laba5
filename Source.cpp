@@ -206,22 +206,64 @@ namespace dynamic_cast_examples {
 		}
 	}
 }
+namespace objects_like_p {
+	class Base {
+	private:
+		int x, y;
+	public:
+		void set(int x, int y) { this->x = x; this->y = y; }
+		int get_x() { return x; }
+		int get_y() { return y; }
+		Base() { x = 0; y = 0; printf("Base()\n"); };
+		Base(Base* obj) { this->x = obj->get_x(); this->y = obj->get_y(); printf("Base(Base* obj)\n"); };
+		Base(Base& obj) { this->x = obj.get_x(); this->y = obj.get_y(); printf("Base(Base& obj)\n"); };
+		~Base() { printf("~Base()\n"); };
+	};
+	class Desc :public Base {
+	private:
+		int color;
+	public:
+		void set_color(int color) { 0x0 <= color && color <= 0xFFFFFF ? this->color = color : this->color = 0x0; }
+		int get_color() { return color; }
+		Desc() { color = 0x0; printf("Desc()\n"); };
+		Desc(Desc* obj) :Base(obj) { int color = obj->get_color(); 0x0 <= color && color <= 0xFFFFFF ? this->color = color : this->color = 0x0; printf("Desc(Desc* obj)\n"); };
+		Desc(Desc& obj) { int color = obj.get_color(); 0x0 <= color && color <= 0xFFFFFF ? this->color = color : this->color = 0x0; printf("Desc(Desc& obj)\n"); };
+		~Desc() { printf("~Desc()\n"); };
+	};
+	void func1(Base  obj) { printf("func1:\n в функцию была передана копия объекта.\n%d\nx:%d y:%d\n", &obj, obj.get_x(), obj.get_y()); };
+	void func2(Base* obj) { printf("func1:\n в функцию был передан указатель на объект.\n%d\nx:%d y:%d\n", &obj, obj->get_x(), obj->get_y()); };
+	void func3(Base& obj) { printf("func1:\n в функцию был передан объект.\n%d\nx:%d y:%d\n", &obj, obj.get_x(), obj.get_y()); };
+
+	Base func1() { Base obj; return obj; };
+	Base* func2() { return new Base(); };
+	Base& func3() { Base obj; return obj; };
+
+}
+namespace smart_pointers {
+	class Object {
+	public:
+		std::string name;
+
+		Object() { name = "задайте имя"; std::cout<<"Создан объект класса Object \"" + name + "\"\n"; }
+		Object(std::string name) { this->name = name; std::cout << "Создан объект класса Object \"" + name + "\"\n";}
+		~Object() { printf("Объект класса Object удален.\n"); }
+	};
+}
 void next() {
 	_getch();
 	system("cls");
 	printf("\n");
 }
 int main() {
-	setlocale(LC_ALL, "Russian"); 
-	
+	setlocale(LC_ALL, "Russian");
+
 	{
 		using namespace virtual_destructor;
-		Base* desc = new Desc(5,3);
+		Base* desc = new Desc(5, 3);
 		desc->take_away();
 		printf("рельзутат работы метода: %d\n", desc->result());
 		delete desc;
 		printf("Виртуальный деструктор нужен, чтобы при удалении объекта класса наследника из переменной базового класса вызывался правильный деструктор\n");
-
 	}
 	next();
 	{
@@ -242,7 +284,7 @@ int main() {
 		desc->v_meth();
 		delete desc;
 	}
-	next(); 
+	next();
 	{
 		using namespace check_classes;
 		first_c* fc1 = new first_c();
@@ -318,19 +360,19 @@ int main() {
 		printf("создадим два массива с указателями класса first fcm[3] и класса second scm[3].\nЗаполним первый массив указателями на объекты классов first,second,third\nи с помощью опасного приведения типов запишем указатели из первого массива во второй.\n");
 		for (int i = 0; i < 3; i++) {
 			if (fcm[i]->isA("second")) {
-				printf("проверка isA(\"second\") == true\nscm[%d]=fcm[%d] (fcm[%d]-> ",i,i,i); std::cout << fcm[i]->classname()<<")\n";
+				printf("проверка isA(\"second\") == true\nscm[%d]=fcm[%d] (fcm[%d]-> ", i, i, i); std::cout << fcm[i]->classname() << ")\n";
 				scm[i] = (second_c*)fcm[i];
 			}
 			else {
 				printf("проверка isA(\"second\")== false\n");
 				printf("fcm[% d] -> ", i);
-				std::cout<<fcm[i]->classname()<<"\n";
+				std::cout << fcm[i]->classname() << "\n";
 			}
 		}
 		printf("\nТеперь массив scm выглядит так:\n");
 		for (int i = 0; i < 3; i++) {
 			if (scm[i] != NULL) {
-				std::cout <<i<<"-й" << " объект: " << scm[i]->classname() << "\n";
+				std::cout << i << "-й" << " объект: " << scm[i]->classname() << "\n";
 			}
 			else {
 				printf("%d-й объект: NULL\n", i);
@@ -342,7 +384,7 @@ int main() {
 	}
 	next();
 	{
-		int n=-1;
+		int n = -1;
 		using namespace dynamic_cast_examples;
 		while (n < 2 || n>100) {
 			system("cls");
@@ -350,14 +392,14 @@ int main() {
 			std::cin >> n;
 		}
 		Point p;
-		Object** storage = new Object*[n];
+		Object** storage = new Object * [n];
 		printf("Применим метод set_radius к объектам Circle с помощью dynamic_cast:\n");
 		printf(",--]storage-info[--,\n");
 		for (int i = 0; i < n; i++) {
 			storage[i] = create_rand_obj();
 			storage[i]->set_id(i);
 			Circle* c_ptr = dynamic_cast<Circle*>(storage[i]);
-			Point*  p_ptr = dynamic_cast<Point*>(storage[i]);
+			Point* p_ptr = dynamic_cast<Point*>(storage[i]);
 			Triangle* t_ptr = dynamic_cast<Triangle*>(storage[i]);
 			if (c_ptr != NULL) {
 				printf("|%d| Circle - (%d,%d,%d)", i, c_ptr->get_x(), c_ptr->get_y(), c_ptr->get_radius());
@@ -379,6 +421,55 @@ int main() {
 			delete storage[i];
 		}
 		delete[] storage;
+	}
+	next();
+	{
+		using namespace objects_like_p;
+		Base bobj;
+		Desc dobj;
+		bobj.set(randomizer(-10, 10), randomizer(-10, 10));
+		dobj.set(randomizer(-10, 10), randomizer(-10, 10));
+		func1(bobj);
+		func2(&bobj);
+		func3(bobj);
+		printf("\n");
+
+		func1(dobj);
+		func2(&dobj);
+		func3(dobj);
+		printf("\n");
+
+		printf("Base func1()\n");
+		Base obj1;
+		obj1 = func1();
+		printf("Base* func2()\n");
+		Base* obj2 = func2();
+		printf("Base& func3()\n");
+		Base obj3 = func3();
+	}
+	next();
+	{
+		//умные указатели
+		using namespace smart_pointers;
+		std::string name = "Объект";
+		{
+			printf("unique ptr:\n");
+			std::unique_ptr<Object> first_ptr = std::make_unique<Object>(name);
+			std::unique_ptr<Object> second_ptr;
+			std::cout << "Первый указатель: " << (static_cast<bool>(first_ptr) ? "не null\n" : "null\n");
+			std::cout << "Второй указатель: " << (static_cast<bool>(second_ptr) ? "не null\n" : "null\n");
+			second_ptr = move(first_ptr);
+			std::cout << "Первый указатель: " << (static_cast<bool>(first_ptr) ? "не null\n" : "null\n");
+			std::cout << "Второй указатель: " << (static_cast<bool>(second_ptr) ? "не null\n" : "null\n");
+		}
+		{
+
+			printf("\n\nshared ptr:\n");
+			std::shared_ptr<Object> first_ptr = std::make_shared<Object>(name);
+			printf("shared ptr первый указатель: %p\n", &first_ptr);
+			std::shared_ptr<Object> second_ptr = first_ptr;
+			printf("shared ptr второй указатель: %p\n", &second_ptr);
+		}
 	}
 	return 0;
 }
