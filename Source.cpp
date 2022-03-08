@@ -31,11 +31,11 @@ namespace virtual_destructor {
 		}
 	};
 	class Desc : public Base{
-	public:
+	public:	
 		int take_away() { printf("вызван переопределённый метод класса наследника take_away()\n"); return res = num2 - num1; }
 		Desc() :Base() {cname = 'c'; what_was_created();}
 		Desc(int num1, int num2) : Base(num1, num2) {cname = 'c'; what_was_created();}
-		void what_was_created() {printf("был создан объект класса Base(%d,%d)\n", num1, num2);
+		void what_was_created() {printf("был создан объект класса Desc(%d,%d)\n", num1, num2);
 		}
 		~Desc() { printf("~вызван деструктор ~Desc()\n"); }
 	};
@@ -45,8 +45,6 @@ namespace overriden_methods {
 	protected:
 		virtual void what_was_created() = NULL;
 	public:
-		//virtual void v_first_meth() = NULL;
-		//virtual void second_meth() = NULL;
 	};
 	class Base : public IBase {
 	protected:
@@ -64,7 +62,8 @@ namespace overriden_methods {
 	public:
 		Desc() { cname = 'c'; what_was_created(); }
 		void what_was_created() {printf("Создан объект Desc()\n");}
-		void second_meth() { printf("Вызван 2-ой метод класса Desc\n"); }
+		void v_second_meth() { printf("Вызван 2-ой метод класса Desc\n"); }
+		void nv_second_meth() { printf("Вызван 2-ой метод класса Desc\n"); }
 		~Desc() { printf("~вызван деструктор ~Desc()\n"); }
 	};
 }
@@ -271,10 +270,10 @@ int main() {
 		//что происходит при вызове метода1 у класса - потомка ?
 		using namespace overriden_methods;
 		Desc desc;
-		desc.v_first_meth(); //этот метод виртуальный
-		printf("В этом случае вызывается функция second_meth базового класса Base\n");
 		desc.nv_first_meth();//этот метод не виртуальный
 		printf("В этом случае вызывается функция second_meth базового класса Base\n");
+		desc.v_first_meth(); //этот метод виртуальный
+		printf("В этом случае вызывается функция second_meth базового класса Desc\n");
 	}
 	next();
 	{
